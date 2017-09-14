@@ -32,5 +32,63 @@ namespace NavigationApp.Controllers
 
             return View();
         }
+
+        public ActionResult Create() {
+            // Формируем список команд для передачи в представление
+            SelectList teams = new SelectList(db.Teams, "Id", "Name");
+            ViewBag.Teams = teams;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Create(Player player) {
+            // Добавляем игрока в таблицу
+            db.Players.Add(player);
+            db.SaveChanges();
+            // Перенаправляем на главную страницу
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return HttpNotFound();
+            }
+            // Находим в БД футболиста
+            Player player = db.Players.Find(id);
+            if (id != null)
+            {
+                // Формируем список команд для передачи в представление
+                SelectList teams = new SelectList(db.Teams, "Id", "Name", player.TeamId);
+                ViewBag.Teams = teams;
+                return View(player);
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Player player)
+        {
+            db.Entry(player).State = EntityState.Modified;
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return HttpNotFound();
+            }
+            // Находим в БД футболиста
+            Player player = db.Players.Find(id);
+            if (id != null)
+            {
+                db.Players.Remove(player);
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
     }
 }
